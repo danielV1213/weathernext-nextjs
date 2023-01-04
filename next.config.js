@@ -1,0 +1,13 @@
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  reactStrictMode: true,
+}
+
+module.exports = {
+  images: {
+    domains: [
+      'openweathermap.org',
+      'images.pexels.com'
+    ]
+  }
+}
