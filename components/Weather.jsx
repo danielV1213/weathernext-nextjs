@@ -7,7 +7,7 @@ const Weather = ({ data, weatherIn, feelsLike, humidity, wind }) => {
     description.charAt(0).toUpperCase() + description.slice(1);
 
   return (
-    <div className="relative flex flex-col justify-between max-w-[500px] w-full lg:h-[80vh] md:h-[75vh] sm:h-[70vh] ssm:h-[70vh] m-auto p-4 text-gray-300 z-10">
+    <div className="weatherContainer relative flex flex-col justify-between max-w-[500px] w-full h-[80vh] m-auto p-4 text-gray-300 z-10">
       {/* Top */}
       <div className="relative flex justify-between pt-12">
         <div className="flex flex-col items-center">
