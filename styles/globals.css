@@ -15,20 +15,10 @@
 
 @media screen and (max-width: 515px) {
     .searchContainer {
-        max-width: 350px;
+        max-width: 95vw;
     }
 
     .weatherContainer {
         height: 75vh;
-    }
-}
-
-@media screen and (max-width: 280px) {
-    .searchContainer {
-        max-width: 250px;
-    }
-
-    .weatherContainer {
-        height: 84vh;
     }
 }
