@@ -32,10 +32,10 @@ export default function Home() {
   let language = 'sp'
   let langSB = ''
   let placeholder = 'Buscar ciudad'
-  let weatherIn = 'Clima en '
-  let feelsLike = 'Se siente de '
-  let humidity = 'Humedad '
-  let wind = 'Viento '
+  let weatherIn = 'Clima en'
+  let feelsLike = 'Se siente de'
+  let humidity = 'Humedad'
+  let wind = 'Viento'
 
   const handleLanguageChange = () => {
     setLanguageChange(!languageChange)
@@ -46,18 +46,18 @@ export default function Home() {
     language = 'sp'
     langSB = 'Español seleccionado'
     placeholder = 'Buscar ciudad'
-    weatherIn = 'Clima en '
-    feelsLike = 'Se siente de '
-    humidity = 'Humedad '
-    wind = 'Viento '
+    weatherIn = 'Clima en'
+    feelsLike = 'Se siente de'
+    humidity = 'Humedad'
+    wind = 'Viento'
   } else {
     language = 'en'
     langSB = 'English selected'
     placeholder = 'Search city'
-    weatherIn = 'Weather in '
-    feelsLike = 'Feels like '
-    humidity = 'Humidity '
-    wind = 'Wind '
+    weatherIn = 'Weather in'
+    feelsLike = 'Feels like'
+    humidity = 'Humidity'
+    wind = 'Wind'
   }
 
   const handleToClose = (event, reason) => {
