@@ -6,7 +6,7 @@ const Spinner = () => {
   return (
     <div>
       <Image
-        className='w-[150px] mx-auto my-[20vh] relative'
+        className='w-[180px] mx-auto my-[20vh] relative z-10'
         src={spinner}
         alt='loading'
       />

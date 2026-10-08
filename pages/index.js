@@ -26,6 +26,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [languageChange, setLanguageChange] = useState(false);
   const [open, setOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
 
   //Variables
   let language = "sp";
@@ -35,9 +36,11 @@ export default function Home() {
   let feelsLike = "Se siente de";
   let humidity = "Humedad";
   let wind = "Viento";
+  let errorMessage = "No se pudo obtener el clima. Intenta de nuevo.";
 
   const handleLanguageChange = () => {
     setLanguageChange(!languageChange);
+    setSnackbarMessage(null);
     setOpen(true);
   };
 
@@ -49,6 +52,7 @@ export default function Home() {
     feelsLike = "Se siente de";
     humidity = "Humedad";
     wind = "Viento";
+    errorMessage = "No se pudo obtener el clima. Intenta de nuevo.";
   } else {
     language = "en";
     langSB = "English selected";
@@ -57,6 +61,7 @@ export default function Home() {
     feelsLike = "Feels like";
     humidity = "Humidity";
     wind = "Wind";
+    errorMessage = null;
   }
 
   const handleToClose = (event, reason) => {
@@ -70,11 +75,23 @@ export default function Home() {
   const fetchWeather = (e) => {
     e.preventDefault();
     setLoading(true);
-    axios.get(url).then((response) => {
-      setWeather(response.data);
-      setLoading(false);
-      // console.log(response.data);
-    });
+    axios
+      .get(url)
+      .then((response) => {
+        setWeather(response.data);
+        // console.log(response.data);
+      })
+      .catch((error) => {
+        const message =
+          errorMessage ||
+          error.response?.data?.message ||
+          "Something went wrong. Please try again.";
+        setSnackbarMessage(message);
+        setOpen(true);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
     setCity("");
   };
   return (
@@ -125,7 +142,7 @@ export default function Home() {
           }}
           open={open}
           autoHideDuration={5000}
-          message={langSB}
+          message={snackbarMessage || langSB}
           onClose={handleToClose}
           action={
             <Fragment>
