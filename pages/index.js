@@ -1,34 +1,22 @@
-//Hooks and main imports
-import { React, useState, Fragment } from "react";
-
-//API Calls
+import { useState } from "react";
+import { Inter } from "@next/font/google";
 import axios from "axios";
-
-// Components
 import Head from "next/head";
 import Image from "next/image";
+import Search from "../components/Search";
 import Weather from "../components/Weather";
 import Spinner from "../components/Spinner";
-
-//Icons and UI
-import { Inter } from "@next/font/google";
-import { BsSearch, BsTranslate } from "react-icons/bs";
-import IconButton from "@material-ui/core/IconButton";
-import Snackbar from "@material-ui/core/Snackbar";
-import CloseIcon from "@material-ui/icons/Close";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
-  //Constants
-  const [city, setCity] = useState("");
-  const [weather, setWeather] = useState({});
-  const [loading, setLoading] = useState(false);
-  const [languageChange, setLanguageChange] = useState(false);
-  const [open, setOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [weather, setWeather] = useState({});
+  const [city, setCity] = useState("");
+  const [languageChange, setLanguageChange] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
-  //Variables
   let language = "sp";
   let langSB = "";
   let placeholder = "Buscar ciudad";
@@ -41,7 +29,7 @@ export default function Home() {
   const handleLanguageChange = () => {
     setLanguageChange(!languageChange);
     setSnackbarMessage(null);
-    setOpen(true);
+    setIsOpen(true);
   };
 
   if (!languageChange) {
@@ -64,22 +52,26 @@ export default function Home() {
     errorMessage = null;
   }
 
+  let labels = {
+    placeholder: placeholder,
+    snackbarMessage: snackbarMessage,
+    langSB: langSB,
+  };
+
   const handleToClose = (event, reason) => {
     if ("clickaway" == reason) return;
-    setOpen(false);
+    setIsOpen(false);
   };
 
   const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&lang=${language}&appid=${process.env.NEXT_PUBLIC_WEATHER_KEY}`;
-  // console.log(city)
 
   const fetchWeather = (e) => {
     e.preventDefault();
-    setLoading(true);
+    setIsLoading(true);
     axios
       .get(url)
       .then((response) => {
         setWeather(response.data);
-        // console.log(response.data);
       })
       .catch((error) => {
         const message =
@@ -87,10 +79,10 @@ export default function Home() {
           error.response?.data?.message ||
           "Something went wrong. Please try again.";
         setSnackbarMessage(message);
-        setOpen(true);
+        setIsOpen(true);
       })
       .finally(() => {
-        setLoading(false);
+        setIsLoading(false);
       });
     setCity("");
   };
@@ -115,55 +107,20 @@ export default function Home() {
       />
 
       {/* Search */}
-      <div className='searchContainer relative flex flex-col justify-between items-center max-w-[500px] w-full m-auto pt-4 text-white z-[11]'>
-        <form
-          onSubmit={fetchWeather}
-          className='flex justify-between items-center w-full m-auto p-3 bg-transparent border border-gray-300 text-white rounded-2xl'
-        >
-          <div>
-            <input
-              onChange={(e) => setCity(e.target.value)}
-              className='bg-transparent border-none text-white focus:outline-none text-2xl'
-              type='text'
-              placeholder={placeholder}
-            />
-          </div>
-          <button onClick={fetchWeather}>
-            <BsSearch size={20} />
-          </button>
-        </form>
-        <button className='mt-2' onClick={handleLanguageChange}>
-          <BsTranslate size={28} />
-        </button>
-        <Snackbar
-          anchorOrigin={{
-            horizontal: "left",
-            vertical: "bottom",
-          }}
-          open={open}
-          autoHideDuration={5000}
-          message={snackbarMessage || langSB}
-          onClose={handleToClose}
-          action={
-            <Fragment>
-              <IconButton
-                size='medium'
-                aria-label='close'
-                color='inherit'
-                onClick={handleToClose}
-              >
-                <CloseIcon fontSize='small' />
-              </IconButton>
-            </Fragment>
-          }
-        />
-      </div>
+      <Search
+        isOpen={isOpen}
+        labels={labels}
+        {...{ fetchWeather }}
+        {...{ setCity }}
+        {...{ handleLanguageChange }}
+        {...{ handleToClose }}
+      />
+      {/* Search end */}
 
-      {loading ? (
+      {isLoading ? (
         <Spinner />
       ) : (
         /* Weather */
-        /* If the endpoint .main is true, then we will display the component <Weather/> */
         weather.main && (
           <Weather
             data={weather}
