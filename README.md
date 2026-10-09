@@ -1,36 +1,69 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# WeatherNext
+
+A weather app built with [Next.js](https://nextjs.org/) (Pages Router), React, Tailwind CSS and MUI. It fetches current weather data from the [OpenWeather API](https://openweathermap.org/api).
 
 ## Getting Started
 
-First, run the development server:
+**Prerequisites:** Node.js and npm. This project uses **npm** as its package manager (do not use yarn).
+
+1. Install dependencies:
+
+```bash
+npm install
+```
+
+2. Create a `.env` file in the project root with your OpenWeather API key:
+
+```bash
+NEXT_PUBLIC_WEATHER_KEY=your_api_key
+```
+
+3. Run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+## Scripts
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
+| Command         | Description                      |
+| --------------- | -------------------------------- |
+| `npm run dev`   | Start the development server     |
+| `npm run build` | Create a production build        |
+| `npm run start` | Serve the production build       |
+| `npm run lint`  | Run ESLint through `next lint`   |
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+## Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+```
+.
+├── components/        # Reusable UI components
+│   ├── Search.jsx     # City search input
+│   ├── Spinner.jsx    # Loading indicator
+│   └── Weather.jsx    # Weather results display
+├── pages/             # Next.js routes
+│   ├── _app.js        # App wrapper
+│   ├── _document.js   # Custom document
+│   └── index.js       # Home page (fetches weather data)
+├── public/            # Static assets (icons, images)
+├── styles/
+│   └── globals.css    # Global styles (Tailwind directives)
+├── next.config.js
+├── postcss.config.js
+└── tailwind.config.js
+```
+
+## Guidelines
+
+- Use **npm** only. Commit `package-lock.json`; do not add `yarn.lock`.
+- Keep secrets in `.env` (git-ignored). Never commit it.
+- Place reusable UI in `components/` (PascalCase `.jsx` files) and routes in `pages/`.
+- Style with Tailwind utility classes; use MUI components where already established.
+- Follow the existing code patterns, and keep changes scoped to what the task requires.
 
 ## Learn More
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+- [Next.js Documentation](https://nextjs.org/docs)
+- [OpenWeather API Documentation](https://openweathermap.org/api)

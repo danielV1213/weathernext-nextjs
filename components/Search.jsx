@@ -1,7 +1,7 @@
 import { Fragment } from "react";
-import { IconButton, Snackbar } from "@material-ui/core";
+import { IconButton, Snackbar } from "@mui/material";
 import { BsSearch, BsTranslate } from "react-icons/bs";
-import CloseIcon from "@material-ui/icons/Close";
+import CloseIcon from "@mui/icons-material/Close";
 
 const Search = ({
   labels,
@@ -38,7 +38,7 @@ const Search = ({
           vertical: "bottom",
         }}
         open={isOpen}
-        autoHideDuration={5000}
+        autoHideDuration={2500}
         message={labels.snackbarMessage || labels.langSB}
         onClose={handleToClose}
         action={
