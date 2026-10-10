@@ -40,26 +40,49 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 ```
 .
 ├── components/        # Reusable UI components
-│   ├── Search.jsx     # City search input
+│   ├── Notification.jsx # Snackbar for errors and language changes
+│   ├── Search.jsx     # City search input + language toggle
 │   ├── Spinner.jsx    # Loading indicator
 │   └── Weather.jsx    # Weather results display
 ├── docs/              # Project documentation (e.g. i18n-plan.md)
-├── hooks/
-│   └── useTranslation.js # i18n hook (translations + language toggle)
+├── hooks/             # Custom React hooks (state logic)
+│   ├── useTranslation.js # i18n hook (translations + language toggle)
+│   └── useWeather.js  # Weather state (data, loading, errors, locale refetch)
 ├── locales/           # Translation files, one JSON per locale
 │   ├── en-US.json
 │   └── es-CO.json
 ├── pages/             # Next.js routes
 │   ├── _app.js        # App wrapper
 │   ├── _document.js   # Custom document
-│   └── index.js       # Home page (fetches weather data)
+│   └── index.js       # Home page (composes hooks and components)
 ├── public/            # Static assets (icons, images)
+├── services/          # API calls, no React
+│   └── weatherService.js # OpenWeather requests
 ├── styles/
 │   └── globals.css    # Global styles (Tailwind directives)
 ├── next.config.js
 ├── postcss.config.js
 └── tailwind.config.js
 ```
+
+## Architecture
+
+The code is split into layers, each with one job:
+
+| Layer | Location | Responsibility |
+| ----- | -------- | -------------- |
+| Service | `services/` | Calls the API and returns the data. Takes plain parameters and doesn't use React, hooks or translations. |
+| Hook | `hooks/` | Holds the React state for a feature (data, loading, errors) and calls the services. |
+| Component | `components/` | Renders the UI. Gets its translated text from `useTranslation()`. |
+| Page | `pages/` | Connects hooks and components and owns page-level UI state (e.g. the notification). |
+
+Data flow for a search:
+
+1. `Search` submits the form.
+2. `pages/index.js` calls `getWeather(city)` from `useWeather`.
+3. `useWeather` calls `getWeatherByCity(city, lang)` from `weatherService`.
+4. `useWeather` updates `weather` and `isLoading`, or sends a translated error message through its `onError` callback.
+5. `pages/index.js` renders `Weather`, `Spinner` or `Notification`.
 
 ## Internationalization (i18n)
 
@@ -74,7 +97,7 @@ The app supports Spanish (`es-CO`, default) and English (`en-US`) using Next.js 
   - `locale`: the active locale.
   - `toggleLocale()`: switches to the other locale with a client-side route change. There's no page reload, and page state is preserved.
 - **Components** call `useTranslation()` themselves instead of receiving translated strings as props.
-- **Weather data:** when the locale changes, `pages/index.js` fetches the last searched city again, so the weather description from the API matches the new language.
+- **Weather data:** when the locale changes, `useWeather` fetches the last searched city again, so the weather description from the API matches the new language.
 
 ### Usage
 
@@ -105,6 +128,7 @@ See [docs/i18n-plan.md](docs/i18n-plan.md) for the implementation plan and the d
 - Use **npm** only. Commit `package-lock.json`; do not add `yarn.lock`.
 - Keep secrets in `.env` (git-ignored). Never commit it.
 - Place reusable UI in `components/` (PascalCase `.jsx` files) and routes in `pages/`.
+- Put API calls in `services/` and stateful logic in `hooks/` (`useXxx.js`). Keep pages focused on wiring them together.
 - Style with Tailwind utility classes; use MUI components where already established.
 - Never hardcode UI text. Add it to every file in `locales/` and read it with `t()` from `useTranslation`.
 - Follow the existing code patterns, and keep changes scoped to what the task requires.

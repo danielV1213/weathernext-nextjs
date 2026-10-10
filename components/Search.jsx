@@ -1,17 +1,7 @@
-import { Fragment } from "react";
-import { IconButton, Snackbar } from "@mui/material";
 import { BsSearch, BsTranslate } from "react-icons/bs";
-import CloseIcon from "@mui/icons-material/Close";
 import useTranslation from "../hooks/useTranslation";
 
-const Search = ({
-  snackbarMessage,
-  fetchWeather,
-  setCity,
-  handleLanguageChange,
-  isOpen,
-  handleToClose,
-}) => {
+const Search = ({ fetchWeather, setCity, handleLanguageChange }) => {
   const { t } = useTranslation();
 
   return (
@@ -35,28 +25,6 @@ const Search = ({
       <button className='mt-2' onClick={handleLanguageChange}>
         <BsTranslate size={28} />
       </button>
-      <Snackbar
-        anchorOrigin={{
-          horizontal: "left",
-          vertical: "bottom",
-        }}
-        open={isOpen}
-        autoHideDuration={2500}
-        message={snackbarMessage || t("langSB")}
-        onClose={handleToClose}
-        action={
-          <Fragment>
-            <IconButton
-              size='medium'
-              aria-label='close'
-              color='inherit'
-              onClick={handleToClose}
-            >
-              <CloseIcon fontSize='small' />
-            </IconButton>
-          </Fragment>
-        }
-      />
     </div>
   );
 };

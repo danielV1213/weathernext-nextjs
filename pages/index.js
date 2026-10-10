@@ -1,24 +1,31 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Inter } from "@next/font/google";
-import axios from "axios";
 import Head from "next/head";
 import Image from "next/image";
 import Search from "../components/Search";
 import Weather from "../components/Weather";
 import Spinner from "../components/Spinner";
+import Notification from "../components/Notification";
 import useTranslation from "../hooks/useTranslation";
+import useWeather from "../hooks/useWeather";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
   const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [weather, setWeather] = useState({});
   const [city, setCity] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const [lastCity, setLastCity] = useState("");
 
-  const { t, locale, toggleLocale } = useTranslation();
+  const { t, toggleLocale } = useTranslation();
+
+  const showError = (message) => {
+    setSnackbarMessage(message);
+    setIsOpen(true);
+  };
+
+  const { weather, isLoading, getWeather } = useWeather({
+    onError: showError,
+  });
 
   const handleLanguageChange = () => {
     toggleLocale();
@@ -33,41 +40,12 @@ export default function Home() {
     setIsOpen(false);
   };
 
-  const getWeather = (query) => {
-    const url = `https://api.openweathermap.org/data/2.5/weather?q=${query}&units=metric&lang=${t("apiLang")}&appid=${process.env.NEXT_PUBLIC_WEATHER_KEY}`;
-    setIsLoading(true);
-    axios
-      .get(url)
-      .then((response) => {
-        setWeather(response.data);
-        setLastCity(query);
-      })
-      .catch((error) => {
-        const message =
-          t("errorMessage") ||
-          error.response?.data?.message ||
-          "Something went wrong. Please try again.";
-        setSnackbarMessage(message);
-        setIsOpen(true);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  };
-
   const fetchWeather = (e) => {
     e.preventDefault();
     getWeather(city);
     setCity("");
   };
 
-  // Refetch the displayed city so the API description matches the new locale
-  // Maybe too much for a translation, but for an app this small, it works.
-  useEffect(() => {
-    if (lastCity) {
-      getWeather(lastCity);
-    }
-  }, [locale]);
   return (
     <div>
       <Head>
@@ -90,14 +68,17 @@ export default function Home() {
 
       {/* Search */}
       <Search
-        isOpen={isOpen}
-        snackbarMessage={snackbarMessage}
         {...{ fetchWeather }}
         {...{ setCity }}
         {...{ handleLanguageChange }}
-        {...{ handleToClose }}
       />
       {/* Search end */}
+
+      <Notification
+        isOpen={isOpen}
+        message={snackbarMessage || t("langSB")}
+        {...{ handleToClose }}
+      />
 
       {isLoading ? (
         <Spinner />
