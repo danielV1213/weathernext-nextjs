@@ -15,5 +15,7 @@
 5. Follow the code patterns of the shared project/snippet.
 6. Don't fix, modify, or add code that falls outside the scope of what was requested.
 7. Don't stage/commit/push any changes unless the user asks you to do it.
+8. Update the documentation of the project (`README.md`) if the applied changes are big enough to modify the structure, architecture or main functionalities of it.
+9. When asked by the user, use the `.github/pull_request_template.md` and based on it, generate a separate `.md` file with a clear and concise description, that the user can paste into the GitHub UI. The generated file shouln't be stored in the project and you must provide the user a link to it so they find it easier.
 
 > **Important note:** the user's instructions take precedence over this list, as long as the user specifies so.

@@ -1,6 +1,8 @@
 import Image from "next/image";
+import useTranslation from "../hooks/useTranslation";
 
-const Weather = ({ data, weatherIn, feelsLike, humidity, wind }) => {
+const Weather = ({ data }) => {
+  const { t } = useTranslation();
   const description = data.weather[0].description;
 
   const uppDescription =
@@ -25,23 +27,23 @@ const Weather = ({ data, weatherIn, feelsLike, humidity, wind }) => {
 
       {/* Bottom Section*/}
       <div className='bg-black/60 p-8 rounded-md'>
-        <p className='text-2xl text-center pb-6'>{weatherIn + data.name}</p>
+        <p className='text-2xl text-center pb-6'>{t("weatherIn") + data.name}</p>
         <div className='flex justify-between text-center'>
           <div>
             <p className='font-bold text-2xl'>
               {data.main.feels_like.toFixed(0)}&#176;
             </p>
-            <p className='text-xl'>{feelsLike}</p>
+            <p className='text-xl'>{t("feelsLike")}</p>
           </div>
           <div>
             <p className='font-bold text-2xl'>{data.main.humidity}%</p>
-            <p className='text-xl'>{humidity}</p>
+            <p className='text-xl'>{t("humidity")}</p>
           </div>
           <div>
             <p className='font-bold text-2xl'>
               {data.wind.speed.toFixed(0)} m/s
             </p>
-            <p className='text-xl'>{wind}</p>
+            <p className='text-xl'>{t("wind")}</p>
           </div>
         </div>
       </div>

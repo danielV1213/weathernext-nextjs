@@ -1,99 +1,51 @@
-//Hooks and main imports
-import { React, useState, Fragment } from "react";
-
-//API Calls
-import axios from "axios";
-
-// Components
+import { useState } from "react";
+import { Inter } from "@next/font/google";
 import Head from "next/head";
 import Image from "next/image";
+import Search from "../components/Search";
 import Weather from "../components/Weather";
 import Spinner from "../components/Spinner";
-
-//Icons and UI
-import { Inter } from "@next/font/google";
-import { BsSearch, BsTranslate } from "react-icons/bs";
-import IconButton from "@material-ui/core/IconButton";
-import Snackbar from "@material-ui/core/Snackbar";
-import CloseIcon from "@material-ui/icons/Close";
+import Notification from "../components/Notification";
+import useTranslation from "../hooks/useTranslation";
+import useWeather from "../hooks/useWeather";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
-  //Constants
-  const [city, setCity] = useState("");
-  const [weather, setWeather] = useState({});
-  const [loading, setLoading] = useState(false);
-  const [languageChange, setLanguageChange] = useState(false);
-  const [open, setOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [city, setCity] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
 
-  //Variables
-  let language = "sp";
-  let langSB = "";
-  let placeholder = "Buscar ciudad";
-  let weatherIn = "Clima en";
-  let feelsLike = "Se siente de";
-  let humidity = "Humedad";
-  let wind = "Viento";
-  let errorMessage = "No se pudo obtener el clima. Intenta de nuevo.";
+  const { t, toggleLocale } = useTranslation();
+
+  const showError = (message) => {
+    setSnackbarMessage(message);
+    setIsOpen(true);
+  };
+
+  const { weather, isLoading, getWeather } = useWeather({
+    onError: showError,
+  });
 
   const handleLanguageChange = () => {
-    setLanguageChange(!languageChange);
+    toggleLocale();
     setSnackbarMessage(null);
-    setOpen(true);
+    setIsOpen(true);
   };
-
-  if (!languageChange) {
-    language = "sp";
-    langSB = "Español seleccionado";
-    placeholder = "Buscar ciudad";
-    weatherIn = "Clima en ";
-    feelsLike = "Se siente de";
-    humidity = "Humedad";
-    wind = "Viento";
-    errorMessage = "No se pudo obtener el clima. Intenta de nuevo.";
-  } else {
-    language = "en";
-    langSB = "English selected";
-    placeholder = "Search city";
-    weatherIn = "Weather in ";
-    feelsLike = "Feels like";
-    humidity = "Humidity";
-    wind = "Wind";
-    errorMessage = null;
-  }
 
   const handleToClose = (event, reason) => {
-    if ("clickaway" == reason) return;
-    setOpen(false);
+    if ("clickaway" == reason) {
+      return;
+    }
+    setIsOpen(false);
   };
-
-  const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&lang=${language}&appid=${process.env.NEXT_PUBLIC_WEATHER_KEY}`;
-  // console.log(city)
 
   const fetchWeather = (e) => {
     e.preventDefault();
-    setLoading(true);
-    axios
-      .get(url)
-      .then((response) => {
-        setWeather(response.data);
-        // console.log(response.data);
-      })
-      .catch((error) => {
-        const message =
-          errorMessage ||
-          error.response?.data?.message ||
-          "Something went wrong. Please try again.";
-        setSnackbarMessage(message);
-        setOpen(true);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    getWeather(city);
     setCity("");
   };
+
   return (
     <div>
       <Head>
@@ -115,64 +67,24 @@ export default function Home() {
       />
 
       {/* Search */}
-      <div className='searchContainer relative flex flex-col justify-between items-center max-w-[500px] w-full m-auto pt-4 text-white z-[11]'>
-        <form
-          onSubmit={fetchWeather}
-          className='flex justify-between items-center w-full m-auto p-3 bg-transparent border border-gray-300 text-white rounded-2xl'
-        >
-          <div>
-            <input
-              onChange={(e) => setCity(e.target.value)}
-              className='bg-transparent border-none text-white focus:outline-none text-2xl'
-              type='text'
-              placeholder={placeholder}
-            />
-          </div>
-          <button onClick={fetchWeather}>
-            <BsSearch size={20} />
-          </button>
-        </form>
-        <button className='mt-2' onClick={handleLanguageChange}>
-          <BsTranslate size={28} />
-        </button>
-        <Snackbar
-          anchorOrigin={{
-            horizontal: "left",
-            vertical: "bottom",
-          }}
-          open={open}
-          autoHideDuration={5000}
-          message={snackbarMessage || langSB}
-          onClose={handleToClose}
-          action={
-            <Fragment>
-              <IconButton
-                size='medium'
-                aria-label='close'
-                color='inherit'
-                onClick={handleToClose}
-              >
-                <CloseIcon fontSize='small' />
-              </IconButton>
-            </Fragment>
-          }
-        />
-      </div>
+      <Search
+        {...{ fetchWeather }}
+        {...{ setCity }}
+        {...{ handleLanguageChange }}
+      />
+      {/* Search end */}
 
-      {loading ? (
+      <Notification
+        isOpen={isOpen}
+        message={snackbarMessage || t("langSB")}
+        {...{ handleToClose }}
+      />
+
+      {isLoading ? (
         <Spinner />
       ) : (
         /* Weather */
-        /* If the endpoint .main is true, then we will display the component <Weather/> */
-        weather.main && (
-          <Weather
-            data={weather}
-            weatherIn={weatherIn}
-            feelsLike={feelsLike}
-            humidity={humidity}
-            wind={wind}
-          />
-        )
+        weather.main && <Weather data={weather} />
         /* Weather end */
       )}
     </div>

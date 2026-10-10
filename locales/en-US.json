@@ -1,0 +1,10 @@
+{
+  "apiLang": "en",
+  "langSB": "English selected",
+  "placeholder": "Search city",
+  "weatherIn": "Weather in ",
+  "feelsLike": "Feels like",
+  "humidity": "Humidity",
+  "wind": "Wind",
+  "errorMessage": "Couldn't get the weather. Please try again."
+}
