@@ -43,6 +43,12 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 │   ├── Search.jsx     # City search input
 │   ├── Spinner.jsx    # Loading indicator
 │   └── Weather.jsx    # Weather results display
+├── docs/              # Project documentation (e.g. i18n-plan.md)
+├── hooks/
+│   └── useTranslation.js # i18n hook (translations + language toggle)
+├── locales/           # Translation files, one JSON per locale
+│   ├── en-US.json
+│   └── es-CO.json
 ├── pages/             # Next.js routes
 │   ├── _app.js        # App wrapper
 │   ├── _document.js   # Custom document
@@ -55,12 +61,52 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 └── tailwind.config.js
 ```
 
+## Internationalization (i18n)
+
+The app supports Spanish (`es-CO`, default) and English (`en-US`) using Next.js [built-in i18n routing](https://nextjs.org/docs/pages/building-your-application/routing/internationalization) and static JSON files. No i18n library is used.
+
+### How it works
+
+- **Routing:** locales are configured in `next.config.js`. Spanish is served at `/` and English at `/en-US`. `localeDetection` is enabled, so on the first visit users with an English browser are redirected to `/en-US`.
+- **Translations:** `locales/<locale>.json` holds every UI string, plus `apiLang` (the language code sent to OpenWeather).
+- **`useTranslation` hook** (`hooks/useTranslation.js`) returns:
+  - `t(key)`: the string for `key` in the current locale.
+  - `locale`: the active locale.
+  - `toggleLocale()`: switches to the other locale with a client-side route change. There's no page reload, and page state is preserved.
+- **Components** call `useTranslation()` themselves instead of receiving translated strings as props.
+- **Weather data:** when the locale changes, `pages/index.js` fetches the last searched city again, so the weather description from the API matches the new language.
+
+### Usage
+
+```jsx
+import useTranslation from "../hooks/useTranslation";
+
+const MyComponent = () => {
+  const { t } = useTranslation();
+  return <p>{t("humidity")}</p>;
+};
+```
+
+### Adding a string
+
+Add the same key to **every** file in `locales/`. A key missing from a locale returns `undefined`.
+
+### Adding a locale
+
+1. Add the locale code to `i18n.locales` in `next.config.js`.
+2. Create `locales/<locale>.json` with all existing keys, including a valid OpenWeather `apiLang`.
+3. Register it in the `translations` map in `hooks/useTranslation.js`.
+4. `toggleLocale()` assumes there are exactly two locales. Replace it with a language selector.
+
+See [docs/i18n-plan.md](docs/i18n-plan.md) for the implementation plan and the design decisions behind it.
+
 ## Guidelines
 
 - Use **npm** only. Commit `package-lock.json`; do not add `yarn.lock`.
 - Keep secrets in `.env` (git-ignored). Never commit it.
 - Place reusable UI in `components/` (PascalCase `.jsx` files) and routes in `pages/`.
 - Style with Tailwind utility classes; use MUI components where already established.
+- Never hardcode UI text. Add it to every file in `locales/` and read it with `t()` from `useTranslation`.
 - Follow the existing code patterns, and keep changes scoped to what the task requires.
 
 ## Learn More

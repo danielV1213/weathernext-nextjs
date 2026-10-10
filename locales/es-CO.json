@@ -1,0 +1,10 @@
+{
+  "apiLang": "es",
+  "langSB": "Español seleccionado",
+  "placeholder": "Buscar ciudad",
+  "weatherIn": "Clima en ",
+  "feelsLike": "Se siente de",
+  "humidity": "Humedad",
+  "wind": "Viento",
+  "errorMessage": "No se pudo obtener el clima. Intenta de nuevo."
+}

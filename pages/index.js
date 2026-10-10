@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Inter } from "@next/font/google";
 import axios from "axios";
 import Head from "next/head";
@@ -6,6 +6,7 @@ import Image from "next/image";
 import Search from "../components/Search";
 import Weather from "../components/Weather";
 import Spinner from "../components/Spinner";
+import useTranslation from "../hooks/useTranslation";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -13,69 +14,37 @@ export default function Home() {
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [weather, setWeather] = useState({});
   const [city, setCity] = useState("");
-  const [languageChange, setLanguageChange] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [lastCity, setLastCity] = useState("");
 
-  let language = "sp";
-  let langSB = "";
-  let placeholder = "Buscar ciudad";
-  let weatherIn = "Clima en";
-  let feelsLike = "Se siente de";
-  let humidity = "Humedad";
-  let wind = "Viento";
-  let errorMessage = "No se pudo obtener el clima. Intenta de nuevo.";
+  const { t, locale, toggleLocale } = useTranslation();
 
   const handleLanguageChange = () => {
-    setLanguageChange(!languageChange);
+    toggleLocale();
     setSnackbarMessage(null);
     setIsOpen(true);
   };
 
-  if (!languageChange) {
-    language = "sp";
-    langSB = "Español seleccionado";
-    placeholder = "Buscar ciudad";
-    weatherIn = "Clima en ";
-    feelsLike = "Se siente de";
-    humidity = "Humedad";
-    wind = "Viento";
-    errorMessage = "No se pudo obtener el clima. Intenta de nuevo.";
-  } else {
-    language = "en";
-    langSB = "English selected";
-    placeholder = "Search city";
-    weatherIn = "Weather in ";
-    feelsLike = "Feels like";
-    humidity = "Humidity";
-    wind = "Wind";
-    errorMessage = null;
-  }
-
-  let labels = {
-    placeholder: placeholder,
-    snackbarMessage: snackbarMessage,
-    langSB: langSB,
-  };
-
   const handleToClose = (event, reason) => {
-    if ("clickaway" == reason) return;
+    if ("clickaway" == reason) {
+      return;
+    }
     setIsOpen(false);
   };
 
-  const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&lang=${language}&appid=${process.env.NEXT_PUBLIC_WEATHER_KEY}`;
-
-  const fetchWeather = (e) => {
-    e.preventDefault();
+  const getWeather = (query) => {
+    const url = `https://api.openweathermap.org/data/2.5/weather?q=${query}&units=metric&lang=${t("apiLang")}&appid=${process.env.NEXT_PUBLIC_WEATHER_KEY}`;
     setIsLoading(true);
     axios
       .get(url)
       .then((response) => {
         setWeather(response.data);
+        setLastCity(query);
       })
       .catch((error) => {
         const message =
-          errorMessage ||
+          t("errorMessage") ||
           error.response?.data?.message ||
           "Something went wrong. Please try again.";
         setSnackbarMessage(message);
@@ -84,8 +53,21 @@ export default function Home() {
       .finally(() => {
         setIsLoading(false);
       });
+  };
+
+  const fetchWeather = (e) => {
+    e.preventDefault();
+    getWeather(city);
     setCity("");
   };
+
+  // Refetch the displayed city so the API description matches the new locale
+  // Maybe too much for a translation, but for an app this small, it works.
+  useEffect(() => {
+    if (lastCity) {
+      getWeather(lastCity);
+    }
+  }, [locale]);
   return (
     <div>
       <Head>
@@ -109,7 +91,7 @@ export default function Home() {
       {/* Search */}
       <Search
         isOpen={isOpen}
-        labels={labels}
+        snackbarMessage={snackbarMessage}
         {...{ fetchWeather }}
         {...{ setCity }}
         {...{ handleLanguageChange }}
@@ -121,15 +103,7 @@ export default function Home() {
         <Spinner />
       ) : (
         /* Weather */
-        weather.main && (
-          <Weather
-            data={weather}
-            weatherIn={weatherIn}
-            feelsLike={feelsLike}
-            humidity={humidity}
-            wind={wind}
-          />
-        )
+        weather.main && <Weather data={weather} />
         /* Weather end */
       )}
     </div>
