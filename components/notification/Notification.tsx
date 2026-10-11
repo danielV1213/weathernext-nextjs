@@ -1,8 +1,13 @@
 import { Fragment } from "react";
 import { IconButton, Snackbar } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import type { NotificationProps } from "./Notification.types";
 
-const Notification = ({ isOpen, message, handleToClose }) => {
+const Notification = ({
+  isOpen,
+  message,
+  handleToClose,
+}: NotificationProps) => {
   return (
     <Snackbar
       anchorOrigin={{
