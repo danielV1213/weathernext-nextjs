@@ -2,23 +2,25 @@ import { useState } from "react";
 import { Inter } from "@next/font/google";
 import Head from "next/head";
 import Image from "next/image";
-import Search from "../components/Search";
-import Weather from "../components/Weather";
-import Spinner from "../components/Spinner";
-import Notification from "../components/Notification";
+import Search from "../components/search/Search";
+import Weather from "../components/weather/Weather";
+import Spinner from "../components/spinner/Spinner";
+import Notification from "../components/notification/Notification";
 import useTranslation from "../hooks/useTranslation";
 import useWeather from "../hooks/useWeather";
+import type { NotificationProps } from "../components/notification/Notification.types";
+import type { SearchProps } from "../components/search/Search.types";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
-  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarMessage, setSnackbarMessage] = useState<string | null>("");
   const [city, setCity] = useState("");
   const [isOpen, setIsOpen] = useState(false);
 
   const { t, toggleLocale } = useTranslation();
 
-  const showError = (message) => {
+  const showError = (message: string) => {
     setSnackbarMessage(message);
     setIsOpen(true);
   };
@@ -33,14 +35,17 @@ export default function Home() {
     setIsOpen(true);
   };
 
-  const handleToClose = (event, reason) => {
+  const handleToClose: NotificationProps["handleToClose"] = (
+    _event,
+    reason,
+  ) => {
     if ("clickaway" == reason) {
       return;
     }
     setIsOpen(false);
   };
 
-  const fetchWeather = (e) => {
+  const fetchWeather: SearchProps["fetchWeather"] = (e) => {
     e.preventDefault();
     getWeather(city);
     setCity("");
@@ -84,7 +89,7 @@ export default function Home() {
         <Spinner />
       ) : (
         /* Weather */
-        weather.main && <Weather data={weather} />
+        weather && <Weather data={weather} />
         /* Weather end */
       )}
     </div>

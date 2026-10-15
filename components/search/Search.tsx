@@ -1,7 +1,12 @@
 import { BsSearch, BsTranslate } from "react-icons/bs";
-import useTranslation from "../hooks/useTranslation";
+import useTranslation from "../../hooks/useTranslation";
+import type { SearchProps } from "./Search.types";
 
-const Search = ({ fetchWeather, setCity, handleLanguageChange }) => {
+const Search = ({
+  fetchWeather,
+  setCity,
+  handleLanguageChange,
+}: SearchProps) => {
   const { t } = useTranslation();
 
   return (

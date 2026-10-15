@@ -1,7 +1,8 @@
 import Image from "next/image";
-import useTranslation from "../hooks/useTranslation";
+import useTranslation from "../../hooks/useTranslation";
+import type { WeatherProps } from "./Weather.types";
 
-const Weather = ({ data }) => {
+const Weather = ({ data }: WeatherProps) => {
   const { t } = useTranslation();
   const description = data.weather[0].description;
 
@@ -27,7 +28,9 @@ const Weather = ({ data }) => {
 
       {/* Bottom Section*/}
       <div className='bg-black/60 p-8 rounded-md'>
-        <p className='text-2xl text-center pb-6'>{t("weatherIn") + data.name}</p>
+        <p className='text-2xl text-center pb-6'>
+          {t("weatherIn") + data.name}
+        </p>
         <div className='flex justify-between text-center'>
           <div>
             <p className='font-bold text-2xl'>
